@@ -36,8 +36,6 @@ fun SimpleColorScreen() {
 
     var inputText by remember { mutableStateOf("Blue") }
     var btnColor by remember { mutableStateOf(Color.Blue) }
-
-
     var errorMessage by remember { mutableStateOf("") }
 
 
@@ -67,7 +65,7 @@ fun SimpleColorScreen() {
                 } else {
 
                     errorMessage = "Цвета \"$inputText\" нет в палитре"
-                    Log.d("colorssss",errorMessage)
+                    Log.d("colors",errorMessage)
                 }
             },
             modifier = Modifier

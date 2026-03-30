@@ -30,7 +30,7 @@ fun CounterScreen(counterViewModel: CounterViewModel = viewModel()) {
     val state by counterViewModel.uiState.collectAsState()
 
     Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
+        modifier = Modifier.fillMaxSize().systemBarsPadding().padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(text = "${state.count}", style = MaterialTheme.typography.displayLarge)

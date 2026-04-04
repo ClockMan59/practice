@@ -9,7 +9,7 @@ data class DepositCalculation(
     val initialAmount: Double,
     val periodMonths: Int,
     val interestRate: Double,
-    val monthlyTopUp: Double,
+    val monthlyTopUp: Double?,
     val finalAmount: Double,
     val interestEarned: Double,
     val calculationDate: Long

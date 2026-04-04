@@ -1,75 +1,101 @@
 package mobile.presentation
 
-import mobile.data.DepositCalculation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import mobile.data.DepositCalculation
 import mobile.domain.DepositRepository
-import kotlin.math.pow
 
 class DepositViewModel(private val repository: DepositRepository) : ViewModel() {
 
-    // Стейты для первого экрана ввода
-    private val _initialAmount = MutableStateFlow("")
-    val initialAmount = _initialAmount.asStateFlow()
 
-    private val _periodMonths = MutableStateFlow("")
-    val periodMonths = _periodMonths.asStateFlow()
+    // ==========================================
+    // ЭТАП 1: Ввод основных параметров
+    // ==========================================
+    var initialAmount: Double = 0.0
+    var periodMonths: Int = 0
 
-    // Стейты для второго экрана ввода
-    private val _monthlyTopUp = MutableStateFlow("")
-    val monthlyTopUp = _monthlyTopUp.asStateFlow()
+    // ==========================================
+    // ЭТАП 2: Дополнительные параметры
+    // ==========================================
+    var interestRate: Double = 0.0
+    var monthlyTopUp: Double? = null // null, если юзер ничего не ввел
 
-    // Результаты расчета
+    // ==========================================
+    // РЕЗУЛЬТАТ И ИСТОРИЯ
+    // ==========================================
+
+    // StateFlow хранит текущий результат расчета для экрана результатов
     private val _calculationResult = MutableStateFlow<DepositCalculation?>(null)
-    val calculationResult = _calculationResult.asStateFlow()
+    val calculationResult: StateFlow<DepositCalculation?> = _calculationResult.asStateFlow()
+    val historyFlow = repository.allCalculations
+    // История всех расчетов напрямую из БД
+    val allCalculations = repository.allCalculations
 
-    val history = repository.allCalculations
+    // ==========================================
+    // ЛОГИКА И ПРАВИЛА (Бизнес-логика)
+    // ==========================================
 
-    fun setInitialAmount(amount: String) { _initialAmount.value = amount }
-    fun setPeriodMonths(months: String) { _periodMonths.value = months }
-    fun setMonthlyTopUp(amount: String) { _monthlyTopUp.value = amount }
+    // Определение доступной ставки в зависимости от срока
+// Функция выдает список ставок в зависимости от срока вклада
+    fun getAvailableRates(): List<Double> {
+        val rates = mutableListOf<Double>()
 
-    fun getAvailableInterestRate(): Double {
-        val months = _periodMonths.value.toIntOrNull() ?: return 0.0
-        return when {
-            months < 6 -> 15.0
-            months in 6..11 -> 10.0
-            else -> 5.0
+        // Изначально 15% доступна всегда, как ты и сказал
+        rates.add(15.0)
+
+        // Проверяем срок (periodMonths мы сохранили еще на Этапе 1)
+        if (periodMonths > 6) {
+            // Если больше 6 месяцев, добавляем в выбор 10%
+            rates.add(10.0)
         }
+
+        // Можешь легко добавлять свои условия дальше. Например:
+        // if (periodMonths >= 12) {
+        //     rates.add(8.5)
+        // }
+
+        return rates
     }
 
+    // Выполнение математического расчета (Сложный процент с пополнением)
     fun calculate() {
-        val p = _initialAmount.value.toDoubleOrNull() ?: 0.0
-        val n = _periodMonths.value.toIntOrNull() ?: 0
-        val pmt = _monthlyTopUp.value.toDoubleOrNull() ?: 0.0
-        val rate = getAvailableInterestRate()
+        var currentBalance = initialAmount
+        var totalInvested = initialAmount
+        val monthlyRate = interestRate / 100.0 / 12.0
 
-        if (p <= 0 || n <= 0) return
+        for (i in 1..periodMonths) {
+            // 1. Начисляем процент на остаток за месяц
+            currentBalance += currentBalance * monthlyRate
 
-        val rm = rate / 12 / 100
-        val finalAmount = if (rm > 0) {
-            p * (1 + rm).pow(n) + pmt * (((1 + rm).pow(n) - 1) / rm)
-        } else {
-            p + (pmt * n)
+            // 2. Добавляем ежемесячное пополнение (если оно есть)
+            val topUp = monthlyTopUp ?: 0.0
+            currentBalance += topUp
+            totalInvested += topUp
         }
 
-        val totalInvested = p + (pmt * n)
+        val finalAmount = currentBalance
         val interestEarned = finalAmount - totalInvested
 
-        _calculationResult.value = DepositCalculation(
-            initialAmount = p,
-            periodMonths = n,
-            interestRate = rate,
-            monthlyTopUp = pmt,
+        // Формируем DBO объект для сохранения
+        val result = DepositCalculation(
+            initialAmount = initialAmount,
+            periodMonths = periodMonths,
+            interestRate = interestRate,
+            monthlyTopUp = monthlyTopUp,
             finalAmount = finalAmount,
             interestEarned = interestEarned,
-            calculationDate = System.currentTimeMillis()
+            calculationDate = System.currentTimeMillis() // Текущее время
         )
+
+        // Публикуем результат, чтобы UI его увидел
+        _calculationResult.value = result
     }
 
+    // Сохранение в базу данных Room
     fun saveCalculation() {
         _calculationResult.value?.let { calc ->
             viewModelScope.launch {
@@ -78,10 +104,12 @@ class DepositViewModel(private val repository: DepositRepository) : ViewModel() 
         }
     }
 
+    // Очистка данных (для кнопки "В начало")
     fun clearData() {
-        _initialAmount.value = ""
-        _periodMonths.value = ""
-        _monthlyTopUp.value = ""
+        initialAmount = 0.0
+        periodMonths = 0
+        interestRate = 0.0
+        monthlyTopUp = null
         _calculationResult.value = null
     }
 }

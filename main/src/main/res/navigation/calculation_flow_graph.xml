@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/calculation_flow_graph"
+    app:startDestination="@id/stepOneFragment">
+
+    <fragment
+        android:id="@+id/stepOneFragment"
+        android:name="ci.nsu.mobile.main.ui.calculations.StepOneFragment">
+        <action
+            android:id="@+id/action_stepOneFragment_to_stepTwoFragment"
+            app:destination="@id/stepTwoFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/stepTwoFragment"
+        android:name="ci.nsu.mobile.main.ui.calculations.StepTwoFragment">
+        <action
+            android:id="@+id/action_stepTwoFragment_to_resultFragment"
+            app:destination="@id/resultFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/resultFragment"
+        android:name="ci.nsu.mobile.main.ui.calculations.ResultFragment" />
+</navigation>

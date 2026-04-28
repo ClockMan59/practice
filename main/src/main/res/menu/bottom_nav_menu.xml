@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/usersFragment"
+        android:icon="@android:drawable/ic_menu_myplaces"
+        android:title="@string/title_users" />
+    <item
+        android:id="@+id/myCalculationsFragment"
+        android:icon="@android:drawable/ic_menu_agenda"
+        android:title="@string/title_my_calculations" />
+    <item
+        android:id="@+id/newCalculationHostFragment"
+        android:icon="@android:drawable/ic_input_add"
+        android:title="@string/title_new_calculation" />
+</menu>

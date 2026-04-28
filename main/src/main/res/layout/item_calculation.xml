@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="8dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="2dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/tvCalcDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textStyle="bold" />
+
+        <ImageButton
+            android:id="@+id/btnDeleteCalculation"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentEnd="true"
+            android:background="@android:color/transparent"
+            android:contentDescription="Удалить"
+            android:src="@android:drawable/ic_menu_delete" />
+
+        <TextView
+            android:id="@+id/tvCalcSummary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tvCalcDate"
+            android:layout_marginTop="8dp"
+            android:layout_toStartOf="@id/btnDeleteCalculation" />
+
+        <TextView
+            android:id="@+id/tvCalcResult"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tvCalcSummary"
+            android:layout_marginTop="8dp"
+            android:textColor="@color/success_green"
+            android:textStyle="bold" />
+    </RelativeLayout>
+</com.google.android.material.card.MaterialCardView>

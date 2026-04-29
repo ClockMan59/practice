@@ -11,8 +11,9 @@ import retrofit2.Retrofit
 
 @OptIn(ExperimentalSerializationApi::class)
 object AppClient {
-    private val baseUrl: String =
-        if (isProbablyEmulator()) BuildConfig.EMULATOR_API_BASE_URL else BuildConfig.API_BASE_URL
+    private val baseUrl: String = BuildConfig.API_BASE_URL
+
+    // private val baseUrl: String = "http://192.168.200.160:8080/api/"
 
     private val json = Json {
         ignoreUnknownKeys = true

@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">main</string>
+    <string name="title_login">Вход</string>
+    <string name="title_register">Регистрация</string>
+    <string name="title_users">Пользователи</string>
+    <string name="title_my_calculations">Мои расчеты</string>
+    <string name="title_new_calculation">Новый расчет</string>
+    <string name="action_logout">Выйти</string>
 </resources>

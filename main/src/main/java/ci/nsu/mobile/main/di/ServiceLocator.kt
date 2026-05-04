@@ -27,7 +27,7 @@ class ServiceLocator(context: Context) {
 //            secondaryApiService = AppClientFactory.createAlternate(sessionManager),
 //            sessionManager = sessionManager
 //        )
-        MockAuthRepository()
+        MockAuthRepository(sessionManager)
     }
 
     val depositRepository: DepositRepository by lazy {

@@ -1,15 +1,34 @@
 package ci.nsu.mobile.main.data.repository
 
-import ci.nsu.mobile.main.data.model.*
+import ci.nsu.mobile.main.data.local.SessionManager
+import ci.nsu.mobile.main.data.model.GroupDto
+import ci.nsu.mobile.main.data.model.PersonDto
+import ci.nsu.mobile.main.data.model.RegisterRequest
+import ci.nsu.mobile.main.data.model.UserDto
 import kotlinx.coroutines.delay
 
-class MockAuthRepository : AuthRepository {
+class MockAuthRepository(
+    private val sessionManager: SessionManager
+) : AuthRepository {
+
     override suspend fun login(login: String, password: String): Result<UserDto> {
-        delay(500) // Имитируем загрузку
-        return Result.success(
-            UserDto(1, login, "test@nsu.ru",
-                PersonDto("Иван", "Иванов", "Иванович", "2000-01-01", "MALE", 1))
+        delay(500)
+        val user = UserDto(
+            id = 1,
+            login = login,
+            email = "test@nsu.ru",
+            person = PersonDto(
+                firstName = "Иван",
+                lastName = "Иванов",
+                middleName = "Иванович",
+                birthDate = "2000-01-01",
+                gender = "MALE",
+                groupId = 1
+            )
         )
+
+        sessionManager.saveSession("mock-token", user)
+        return Result.success(user)
     }
 
     override suspend fun register(request: RegisterRequest): Result<Unit> {
@@ -18,16 +37,33 @@ class MockAuthRepository : AuthRepository {
     }
 
     override suspend fun getUsers(): Result<List<UserDto>> {
-        return Result.success(emptyList())
+        return Result.success(
+            listOf(
+                UserDto(
+                    id = 1,
+                    login = "test",
+                    email = "test@nsu.ru",
+                    person = PersonDto(
+                        firstName = "Иван",
+                        lastName = "Иванов",
+                        middleName = "Иванович",
+                        birthDate = "2000-01-01",
+                        gender = "MALE",
+                        groupId = 1
+                    )
+                )
+            )
+        )
     }
 
     override suspend fun getGroups(): Result<List<GroupDto>> {
-        // Вот твои группы, которые появятся в приложении!
-        return Result.success(listOf(
-            GroupDto(1, "ИВТ-21"),
-            GroupDto(2, "ПМИ-22"),
-            GroupDto(3, "ФИТ-23"),
-            GroupDto(4, "Матфак-24")
-        ))
+        return Result.success(
+            listOf(
+                GroupDto(1, "ИВТ-21"),
+                GroupDto(2, "ПМИ-22"),
+                GroupDto(3, "ФИТ-23"),
+                GroupDto(4, "Матфак-24")
+            )
+        )
     }
 }
